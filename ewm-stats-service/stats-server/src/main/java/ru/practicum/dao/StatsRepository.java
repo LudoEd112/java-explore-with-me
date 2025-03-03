@@ -13,7 +13,7 @@ import java.util.List;
 public interface StatsRepository extends JpaRepository<Stat, Long> {
 
     @Query("""
-            SELECT new ru.practicum.StatsDtoOutput(s.ip, s.uri, COUNT(DISTINCT s.ip))
+            SELECT new ru.practicum.DtoOutput(s.ip, s.uri, COUNT(DISTINCT s.ip))
             FROM Stat AS s
             WHERE s.timestamp BETWEEN :start AND :end AND s.uri IN :uris
             GROUP BY s.ip, s.uri
@@ -24,7 +24,7 @@ public interface StatsRepository extends JpaRepository<Stat, Long> {
                                                 LocalDateTime end);
 
     @Query("""
-            SELECT new ru.practicum.StatsDtoOutput(s.ip, s.uri, COUNT(DISTINCT s.ip))
+            SELECT new ru.practicum.DtoOutput(s.ip, s.uri, COUNT(DISTINCT s.ip))
             FROM Stat AS s
             WHERE s.timestamp BETWEEN :start AND :end
             GROUP BY s.ip, s.uri
@@ -34,7 +34,7 @@ public interface StatsRepository extends JpaRepository<Stat, Long> {
                                                    LocalDateTime end);
 
     @Query("""
-            SELECT new ru.practicum.StatsDtoOutput(s.ip, s.uri, COUNT(s.ip))
+            SELECT new ru.practicum.DtoOutput(s.ip, s.uri, COUNT(s.ip))
             FROM Stat AS s
             WHERE s.timestamp BETWEEN :start AND :end AND s.uri IN :uris
             GROUP BY s.ip, s.uri
@@ -45,7 +45,7 @@ public interface StatsRepository extends JpaRepository<Stat, Long> {
                                     LocalDateTime end);
 
     @Query("""
-            SELECT new ru.practicum.StatsDtoOutput(s.ip, s.uri, COUNT(s.ip))
+            SELECT new ru.practicum.DtoOutput(s.ip, s.uri, COUNT(s.ip))
             FROM Stat AS s
             WHERE s.timestamp BETWEEN :start AND :end
             GROUP BY s.ip, s.uri
