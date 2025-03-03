@@ -1,8 +1,8 @@
 services:
-  server:
-    build: ewm-stats-service/server
-    image: server-image
-    container_name: server
+  stats-server:
+    build: ewm-stats-service/stats-server
+    image: stats-server-image
+    container_name: stats-server
     ports:
       - "9090:9090"
     depends_on:
