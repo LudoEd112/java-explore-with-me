@@ -47,9 +47,8 @@ public class StatsServiceImpl implements StatsService {
         final List<DtoOutput> stats = getStats(eventsId, unique);
         final Map<Long, Long> views = new HashMap<>();
         for (DtoOutput stat : stats) {
-            final Long id = Long.valueOf(stat.getUri().replace("/events/", ""));
-            final Long view = stat.getHits();
-            views.put(id, view);
+            views.put(Long.valueOf(stat.getUri().replace("/events/", "")),
+                    stat.getHits());
         }
         return views;
     }

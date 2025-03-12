@@ -58,6 +58,7 @@ public class EventServiceImpl implements EventService {
 
     private static final String DATE_TIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(DATE_TIME_PATTERN);
+    private static final long DEFAULT_YEARS_ADDITION = 20;
 
     @Override
     @Transactional(readOnly = true)
@@ -197,58 +198,11 @@ public class EventServiceImpl implements EventService {
         Map<String, List<ParticipationRequestDto>> requestMap = new HashMap<>();
 
         if (requestUpdateDto.getStatus() == ParticipationRequestStatus.REJECTED) {
-            if (requests.stream().anyMatch(r -> r.getStatus() == ParticipationRequestStatus.CONFIRMED)) {
-                throw new ConflictException(
-                        "Запрос на установление статуса <ОТМЕНЕНА>. Подтвержденные заявки нельзя отменить."
-                );
-            }
-            log.info("Запрос на отклонение заявки подтвержден.");
-            requests.forEach(r -> r.setStatus(ParticipationRequestStatus.REJECTED));
-            List<ParticipationRequestDto> rejectedRequests = requests.stream()
-                    .map(participationRequestMapper::toParticipationRequestDto)
-                    .toList();
-            requestMap.put("rejectedRequests", rejectedRequests);
-
+            processRejectedRequests(requests, requestMap);
         } else {
-            if (requests.stream().anyMatch(r -> r.getStatus() != ParticipationRequestStatus.PENDING)) {
-                throw new ConflictException(
-                        "Запрос на установление статуса <ПОДТВЕРЖДЕНА>. Заявки должны быть со статусом <В ОЖИДАНИИ>."
-                );
-            }
-            long limit = event.getParticipantLimit() - event.getConfirmedRequests();
-            if (limit <= 0) {
-                log.info("Свободных мест для подтверждения нет. Все заявки будут отклонены.");
-                requests.forEach(r -> r.setStatus(ParticipationRequestStatus.REJECTED));
-                List<ParticipationRequestDto> rejectedAll = requests.stream()
-                        .map(participationRequestMapper::toParticipationRequestDto)
-                        .toList();
-                requestMap.put("rejectedRequests", rejectedAll);
-                return requestMap;
-            }
-            List<ParticipationRequest> confirmedList = requests.stream()
-                    .limit(limit)
-                    .peek(r -> r.setStatus(ParticipationRequestStatus.CONFIRMED))
-                    .toList();
-            log.info("Заявки на участие со статусом <ПОДТВЕРЖДЕНА> обработаны.");
-
-            List<ParticipationRequestDto> confirmedRequests = confirmedList.stream()
-                    .map(participationRequestMapper::toParticipationRequestDto)
-                    .toList();
-            requestMap.put("confirmedRequests", confirmedRequests);
-
-            List<ParticipationRequest> rejectedList = requests.stream()
-                    .skip(limit)
-                    .peek(r -> r.setStatus(ParticipationRequestStatus.REJECTED))
-                    .toList();
-            log.info("Часть заявок сохранена со статусом <ОТМЕНЕНА>, в связи с превышением лимита.");
-
-            List<ParticipationRequestDto> rejectedRequests = rejectedList.stream()
-                    .map(participationRequestMapper::toParticipationRequestDto)
-                    .toList();
-            requestMap.put("rejectedRequests", rejectedRequests);
-
-            event.setConfirmedRequests(confirmedList.size() + event.getConfirmedRequests());
+            processConfirmedRequests(event, requests, requestMap);
         }
+
         return requestMap;
     }
 
@@ -384,7 +338,7 @@ public class EventServiceImpl implements EventService {
                 : LocalDateTime.now();
         LocalDateTime end = (rangeEnd != null)
                 ? LocalDateTime.parse(rangeEnd, FORMATTER)
-                : LocalDateTime.now().plusYears(20);
+                : LocalDateTime.now().plusYears(DEFAULT_YEARS_ADDITION);
 
         PageRequest pageRequest = PageRequest.of(from / size, size);
         if (start.isAfter(end)) {
@@ -464,5 +418,56 @@ public class EventServiceImpl implements EventService {
         eventResponseLongDto.setViews(Math.toIntExact(view.getOrDefault(event.getId(), 0L)));
         statsService.createStats(request.getRequestURI(), request.getRemoteAddr());
         return eventResponseLongDto;
+    }
+
+    private void processRejectedRequests(List<ParticipationRequest> requests, Map<String, List<ParticipationRequestDto>> requestMap) {
+        if (requests.stream().anyMatch(r -> r.getStatus() == ParticipationRequestStatus.CONFIRMED)) {
+            throw new ConflictException(
+                    "Запрос на установление статуса <ОТМЕНЕНА>. Подтвержденные заявки нельзя отменить."
+            );
+        }
+        log.info("Запрос на отклонение заявки подтвержден.");
+        requests.forEach(r -> r.setStatus(ParticipationRequestStatus.REJECTED));
+        List<ParticipationRequestDto> rejectedRequests = requests.stream()
+                .map(participationRequestMapper::toParticipationRequestDto)
+                .toList();
+        requestMap.put("rejectedRequests", rejectedRequests);
+    }
+
+    private void processConfirmedRequests(Event event, List<ParticipationRequest> requests, Map<String, List<ParticipationRequestDto>> requestMap) {
+        if (requests.stream().anyMatch(r -> r.getStatus() != ParticipationRequestStatus.PENDING)) {
+            throw new ConflictException(
+                    "Запрос на установление статуса <ПОДТВЕРЖДЕНА>. Заявки должны быть со статусом <В ОЖИДАНИИ>."
+            );
+        }
+        long limit = event.getParticipantLimit() - event.getConfirmedRequests();
+        if (limit <= 0) {
+            log.info("Свободных мест для подтверждения нет. Все заявки будут отклонены.");
+            processRejectedRequests(requests, requestMap);
+            return;
+        }
+        List<ParticipationRequest> confirmedList = requests.stream()
+                .limit(limit)
+                .peek(r -> r.setStatus(ParticipationRequestStatus.CONFIRMED))
+                .toList();
+        log.info("Заявки на участие со статусом <ПОДТВЕРЖДЕНА> обработаны.");
+
+        List<ParticipationRequestDto> confirmedRequests = confirmedList.stream()
+                .map(participationRequestMapper::toParticipationRequestDto)
+                .toList();
+        requestMap.put("confirmedRequests", confirmedRequests);
+
+        List<ParticipationRequest> rejectedList = requests.stream()
+                .skip(limit)
+                .peek(r -> r.setStatus(ParticipationRequestStatus.REJECTED))
+                .toList();
+        log.info("Часть заявок сохранена со статусом <ОТМЕНЕНА>, в связи с превышением лимита.");
+
+        List<ParticipationRequestDto> rejectedRequests = rejectedList.stream()
+                .map(participationRequestMapper::toParticipationRequestDto)
+                .toList();
+        requestMap.put("rejectedRequests", rejectedRequests);
+
+        event.setConfirmedRequests(confirmedList.size() + event.getConfirmedRequests());
     }
 }
