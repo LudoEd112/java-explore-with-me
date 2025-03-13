@@ -1,7 +1,6 @@
 package ru.practicum.request.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.user.model.User;
@@ -21,7 +20,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -37,10 +35,8 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
     public List<ParticipationRequestDto> getAllParticipationRequests(Long userId) {
         List<ParticipationRequest> requests = participationRequestRepository.findByRequesterId(userId);
         if (requests.isEmpty()) {
-            log.info("Заявок на участие в мероприятии, у пользователя с id {} пока нет.", userId);
             return new ArrayList<>();
         }
-        log.info("Получение списка всех заявок участия пользователя с id {}.", userId);
         return participationRequestMapper.toParticipationRequestDtoList(requests);
     }
 
@@ -71,14 +67,11 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
                 || (!event.getRequestModeration() && event.getParticipantLimit() > event.getConfirmedRequests())) {
             request.setStatus(ParticipationRequestStatus.CONFIRMED);
             event.setConfirmedRequests(event.getConfirmedRequests() + 1);
-            log.info("Сохранение заявки на участие со статусом <ПОДТВЕРЖДЕНА>.");
         } else if (!event.getRequestModeration()
                 && event.getParticipantLimit().equals(event.getConfirmedRequests())) {
             request.setStatus(ParticipationRequestStatus.REJECTED);
-            log.info("Сохранение заявки со статусом <ОТМЕНЕНА>, т.к. лимит достигнут.");
         } else {
             request.setStatus(ParticipationRequestStatus.PENDING);
-            log.info("Сохранение заявки со статусом <В ОЖИДАНИИ>.");
         }
 
         participationRequestRepository.save(request);
@@ -96,12 +89,10 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
         }
 
         request.setStatus(ParticipationRequestStatus.CANCELED);
-        log.info("Заявка на участие с id = {} отменена.", requestId);
 
         Event event = request.getEvent();
         if (Boolean.TRUE.equals(event.getRequestModeration())) {
             event.setConfirmedRequests(event.getConfirmedRequests() - 1);
-            log.info("Появилось свободное место у события с id = {}.", event.getId());
         }
 
         return participationRequestMapper.toParticipationRequestDto(request);

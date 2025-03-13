@@ -4,7 +4,6 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -40,7 +39,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -67,10 +65,8 @@ public class EventServiceImpl implements EventService {
         Pageable pageable = PageRequest.of(startPage, size);
         List<Event> events = eventRepository.findByInitiatorId(userId, pageable);
         if (events.isEmpty()) {
-            log.info("Списка событий у пользователя с id = {} не найдено.", userId);
             return new ArrayList<>();
         }
-        log.info("Получение списка событий пользователя с id = {}.", userId);
         return eventMapper.toEventShortDtoList(events);
     }
 
@@ -90,7 +86,6 @@ public class EventServiceImpl implements EventService {
 
         Event event = eventMapper.toEvent(eventRequestDto, user, category);
         eventRepository.save(event);
-        log.info("Событие с id = {} и со статусом: {} добавлено", user.getId(), event.getState());
         return eventMapper.toEventFullDto(event);
     }
 
@@ -102,7 +97,6 @@ public class EventServiceImpl implements EventService {
         if (!event.getInitiator().getId().equals(userId)) {
             throw new ValidationException("Пользователь не является инициатором этого события.");
         }
-        log.info("Получение события с id = {}", eventId);
         return eventMapper.toEventFullDto(event);
     }
 
@@ -144,7 +138,6 @@ public class EventServiceImpl implements EventService {
                 oldEvent.setState(EventState.CANCELED);
             }
         }
-        log.info("Событие с id = {} обновлено.", eventId);
         return eventMapper.toEventFullDto(oldEvent);
     }
 
@@ -160,10 +153,8 @@ public class EventServiceImpl implements EventService {
         }
         List<ParticipationRequest> requests = participationRequestRepository.findByEventId(eventId);
         if (requests.isEmpty()) {
-            log.info("Заявок на участие в мероприятии с id = {} нет.", eventId);
             return new ArrayList<>();
         }
-        log.info("Получение списка заявок на участие в мероприятии с id {}.", eventId);
         return participationRequestMapper.toParticipationRequestDtoList(requests);
     }
 
@@ -230,7 +221,6 @@ public class EventServiceImpl implements EventService {
         if (users == null || users.isEmpty()) {
             usersList = userRepository.findAll();
             if (usersList.isEmpty()) {
-                log.info("Еще нет ни одного пользователя, а значит и событий нет.");
                 return new ArrayList<>();
             }
         } else {
@@ -253,7 +243,6 @@ public class EventServiceImpl implements EventService {
         if (categories == null) {
             categoriesList = categoryRepository.findAll();
             if (categoriesList.isEmpty()) {
-                log.info("Еще нет ни одной категории, а значит и событий нет");
                 return new ArrayList<>();
             }
         } else {
@@ -267,10 +256,8 @@ public class EventServiceImpl implements EventService {
                         usersList, eventStates, categoriesList, start, end, pageRequest
                 );
         if (events.isEmpty()) {
-            log.info("По данным параметрам не нашлось ни одного события");
             return new ArrayList<>();
         }
-        log.info("Получен список событий по заданным параметрам");
         return eventMapper.toEventFullDtoList(events);
     }
 
@@ -316,7 +303,6 @@ public class EventServiceImpl implements EventService {
             oldEvent.setState(EventState.CANCELED);
             oldEvent.setPublishedOn(null);
         }
-        log.info("Событие с id = {} обновлено администратором.", eventId);
         return eventMapper.toEventFullDto(oldEvent);
     }
 
@@ -426,7 +412,6 @@ public class EventServiceImpl implements EventService {
                     "Запрос на установление статуса <ОТМЕНЕНА>. Подтвержденные заявки нельзя отменить."
             );
         }
-        log.info("Запрос на отклонение заявки подтвержден.");
         requests.forEach(r -> r.setStatus(ParticipationRequestStatus.REJECTED));
         List<ParticipationRequestDto> rejectedRequests = requests.stream()
                 .map(participationRequestMapper::toParticipationRequestDto)
@@ -442,7 +427,6 @@ public class EventServiceImpl implements EventService {
         }
         long limit = event.getParticipantLimit() - event.getConfirmedRequests();
         if (limit <= 0) {
-            log.info("Свободных мест для подтверждения нет. Все заявки будут отклонены.");
             processRejectedRequests(requests, requestMap);
             return;
         }
@@ -450,7 +434,6 @@ public class EventServiceImpl implements EventService {
                 .limit(limit)
                 .peek(r -> r.setStatus(ParticipationRequestStatus.CONFIRMED))
                 .toList();
-        log.info("Заявки на участие со статусом <ПОДТВЕРЖДЕНА> обработаны.");
 
         List<ParticipationRequestDto> confirmedRequests = confirmedList.stream()
                 .map(participationRequestMapper::toParticipationRequestDto)
@@ -461,7 +444,6 @@ public class EventServiceImpl implements EventService {
                 .skip(limit)
                 .peek(r -> r.setStatus(ParticipationRequestStatus.REJECTED))
                 .toList();
-        log.info("Часть заявок сохранена со статусом <ОТМЕНЕНА>, в связи с превышением лимита.");
 
         List<ParticipationRequestDto> rejectedRequests = rejectedList.stream()
                 .map(participationRequestMapper::toParticipationRequestDto)

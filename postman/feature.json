@@ -1,0 +1,849 @@
+{
+	"info": {
+		"_postman_id": "552e15e1-64b6-4db0-804a-3914311c7f3b",
+		"name": "Test Explore With Me - feature-comment",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "38033366"
+	},
+	"item": [
+		{
+			"name": "Добавление пользователя",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Ответ должен содержать код статуса 201 и данные в формате json\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"    pm.response.to.be.withBody;\r",
+							"    pm.response.to.be.json;\r",
+							"});\r",
+							"\r",
+							"const source = JSON.parse(pm.request.body.raw);\r",
+							"const target = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Пользователь должен содержать поля: id, name, email\", function () {\r",
+							"    pm.expect(target).to.have.property('id');\r",
+							"    pm.expect(target).to.have.property('name');\r",
+							"    pm.expect(target).to.have.property('email');\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Данные в ответе должны соответствовать данным в запросе\", function () {\r",
+							"    pm.expect(target.id).to.not.be.null;\r",
+							"    pm.expect(source.name).equal(target.name, 'Имя пользователя должно соответствовать отправленному в запросе');\r",
+							"    pm.expect(source.email).equal(target.email, 'Почта пользователя должна соответствовать отправленной в запросе');\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const randomName = \"User\" + Math.floor(Math.random() * 10000);\r",
+							"pm.variables.set(\"randomName\", randomName);\r",
+							"\r",
+							"const randomEmail = \"user\" + Math.floor(Math.random() * 10000) + \"@example.com\";\r",
+							"pm.variables.set(\"randomEmail\", randomEmail);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"{{randomName}}\",\r\n    \"email\": \"{{randomEmail}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/admin/users",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"admin",
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Добавление категории",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Ответ должен содержать код статуса 201 и данные в формате json\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"    pm.response.to.be.withBody;\r",
+							"    pm.response.to.be.json;\r",
+							"});\r",
+							"\r",
+							"const source = JSON.parse(pm.request.body.raw);\r",
+							"const target = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Категория должна содержать поля: id, name\", function () {\r",
+							"    pm.expect(target).to.have.property('id');\r",
+							"    pm.expect(target).to.have.property('name');\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Данные в ответе должны соответствовать данным в запросе\", function () {\r",
+							"    pm.expect(target.id).to.not.be.null;\r",
+							"    pm.expect(source.name).equal(target.name, 'Название категории должно совпадать с отправленным');\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const categories = [\"Программирование\", \"Музыка\", \"Искусство\", \"Театр\", \"Кино\", \"Литература\", \"Наука\", \"Спорт\"];\r",
+							"const randomCategoryName = categories[Math.floor(Math.random() * categories.length)];\r",
+							"pm.variables.set(\"randomCategoryName\", randomCategoryName);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"{{randomCategoryName}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/admin/categories",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"admin",
+						"categories"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Добавление события",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Ответ должен содержать код статуса 201 и данные в формате json\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"    pm.response.to.be.withBody;\r",
+							"    pm.response.to.be.json;\r",
+							"});\r",
+							"\r",
+							"const source = JSON.parse(pm.request.body.raw);\r",
+							"const target = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Событие должно содержать поля: id, title, annotation, category, paid, eventDate, initiator, description, participantLimit, state, createdOn, location, requestModeration\", function () {\r",
+							"    pm.expect(target).to.have.property('id');\r",
+							"    pm.expect(target).to.have.property('title');\r",
+							"    pm.expect(target).to.have.property('annotation');\r",
+							"    pm.expect(target).to.have.property('category');\r",
+							"    pm.expect(target).to.have.property('paid');\r",
+							"    pm.expect(target).to.have.property('eventDate');\r",
+							"    pm.expect(target).to.have.property('initiator');\r",
+							"    pm.expect(target).to.have.property('description');\r",
+							"    pm.expect(target).to.have.property('participantLimit');\r",
+							"    pm.expect(target).to.have.property('state');\r",
+							"    pm.expect(target).to.have.property('createdOn');\r",
+							"    pm.expect(target).to.have.property('location');\r",
+							"    pm.expect(target).to.have.property('requestModeration');\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Функция для выполнения POST-запроса\r",
+							"function sendRequest(url, method, body, callback) {\r",
+							"    pm.sendRequest({\r",
+							"        url: url,\r",
+							"        method: method,\r",
+							"        header: { 'Content-Type': 'application/json' },\r",
+							"        body: { mode: 'raw', raw: JSON.stringify(body) }\r",
+							"    }, callback);\r",
+							"}\r",
+							"\r",
+							"// Функция для генерации случайной строки\r",
+							"function generateRandomString(length) {\r",
+							"    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';\r",
+							"    let result = '';\r",
+							"    for (let i = 0; i < length; i++) {\r",
+							"        result += characters.charAt(Math.floor(Math.random() * characters.length));\r",
+							"    }\r",
+							"    return result;\r",
+							"}\r",
+							"\r",
+							"// 1. Создание пользователя\r",
+							"const randomName = \"User\" + generateRandomString(8); // Случайное имя пользователя\r",
+							"const randomEmail = \"user\" + generateRandomString(8) + \"@example.com\"; // Случайный email\r",
+							"\r",
+							"sendRequest(\r",
+							"    \"http://localhost:8080/admin/users\",\r",
+							"    \"POST\",\r",
+							"    { name: randomName, email: randomEmail },\r",
+							"    (err, response) => {\r",
+							"        if (err) {\r",
+							"            console.error(\"Ошибка при создании пользователя:\", err);\r",
+							"            return;\r",
+							"        }\r",
+							"\r",
+							"        const userId = response.json().id;\r",
+							"        pm.variables.set(\"userId\", userId); // Сохраняем ID пользователя\r",
+							"\r",
+							"        // 2. Создание категории\r",
+							"        const randomCategoryName = \"Category_\" + generateRandomString(10); // Случайное название категории\r",
+							"\r",
+							"        sendRequest(\r",
+							"            \"http://localhost:8080/admin/categories\",\r",
+							"            \"POST\",\r",
+							"            { name: randomCategoryName },\r",
+							"            (err, response) => {\r",
+							"                if (err) {\r",
+							"                    console.error(\"Ошибка при создании категории:\", err);\r",
+							"                    return;\r",
+							"                }\r",
+							"\r",
+							"                const categoryId = response.json().id;\r",
+							"                pm.variables.set(\"categoryId\", categoryId); // Сохраняем ID категории\r",
+							"\r",
+							"                // 3. Генерация данных для события\r",
+							"                const randomTitle = \"Event_\" + generateRandomString(12); // Случайное название события\r",
+							"                const randomAnnotation = \"Annotation: \" + generateRandomString(100); // Случайная аннотация\r",
+							"                const randomDescription = \"Description: \" + generateRandomString(200); // Случайное описание\r",
+							"\r",
+							"                // Генерация случайной даты (в формате YYYY-MM-DD HH:MM:SS)\r",
+							"                const randomEventDate = new Date(Date.now() + Math.floor(Math.random() * 10000000000))\r",
+							"                    .toISOString()\r",
+							"                    .replace(\"T\", \" \")\r",
+							"                    .slice(0, 19);\r",
+							"\r",
+							"                // Генерация случайных координат (в допустимых диапазонах)\r",
+							"                const randomLat = (Math.random() * 180 - 90).toFixed(6); // Широта от -90 до 90\r",
+							"                const randomLon = (Math.random() * 360 - 180).toFixed(6); // Долгота от -180 до 180\r",
+							"\r",
+							"                // Установка переменных\r",
+							"                pm.variables.set(\"randomTitle\", randomTitle);\r",
+							"                pm.variables.set(\"randomAnnotation\", randomAnnotation);\r",
+							"                pm.variables.set(\"randomDescription\", randomDescription);\r",
+							"                pm.variables.set(\"randomEventDate\", randomEventDate);\r",
+							"                pm.variables.set(\"randomLat\", randomLat);\r",
+							"                pm.variables.set(\"randomLon\", randomLon);\r",
+							"            }\r",
+							"        );\r",
+							"    }\r",
+							");"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"annotation\": \"{{randomAnnotation}}\",\r\n    \"category\": {{categoryId}},\r\n    \"description\": \"{{randomDescription}}\",\r\n    \"eventDate\": \"{{randomEventDate}}\",\r\n    \"location\": {\r\n        \"lat\": {{randomLat}},\r\n        \"lon\": {{randomLon}}\r\n    },\r\n    \"title\": \"{{randomTitle}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/users/{{userId}}/events",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						"{{userId}}",
+						"events"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Добавление комментария",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const comments = [\r",
+							"    \"Отличное событие!\",\r",
+							"    \"Обязательно приду!\",\r",
+							"    \"Очень интересно!\",\r",
+							"    \"Жду с нетерпением!\",\r",
+							"    \"Скучное мероприятие\"\r",
+							"];\r",
+							"const randomComment = comments[Math.floor(Math.random() * comments.length)];\r",
+							"pm.variables.set(\"randomComment\", randomComment);\r",
+							"\r",
+							"// Функция для выполнения POST-запроса\r",
+							"function sendRequest(url, method, body, callback) {\r",
+							"    pm.sendRequest({\r",
+							"        url: url,\r",
+							"        method: method,\r",
+							"        header: { 'Content-Type': 'application/json' },\r",
+							"        body: { mode: 'raw', raw: JSON.stringify(body) }\r",
+							"    }, callback);\r",
+							"}\r",
+							"\r",
+							"// Функция для генерации случайной строки\r",
+							"function generateRandomString(length) {\r",
+							"    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';\r",
+							"    let result = '';\r",
+							"    for (let i = 0; i < length; i++) {\r",
+							"        result += characters.charAt(Math.floor(Math.random() * characters.length));\r",
+							"    }\r",
+							"    return result;\r",
+							"}\r",
+							"\r",
+							"// 1. Создание пользователя\r",
+							"const randomName = \"User\" + generateRandomString(8);\r",
+							"const randomEmail = \"user\" + generateRandomString(8) + \"@example.com\";\r",
+							"\r",
+							"sendRequest(\r",
+							"    \"http://localhost:8080/admin/users\",\r",
+							"    \"POST\",\r",
+							"    { name: randomName, email: randomEmail },\r",
+							"    (err, response) => {\r",
+							"        if (err) {\r",
+							"            console.error(\"Ошибка при создании пользователя:\", err);\r",
+							"            return;\r",
+							"        }\r",
+							"\r",
+							"        const userId = response.json().id;\r",
+							"        pm.variables.set(\"userId\", userId);\r",
+							"        console.log(\"Создан пользователь. ID:\", userId);\r",
+							"\r",
+							"        // 2. Создание категории\r",
+							"        const randomCategoryName = \"Category_\" + generateRandomString(10);\r",
+							"\r",
+							"        sendRequest(\r",
+							"            \"http://localhost:8080/admin/categories\",\r",
+							"            \"POST\",\r",
+							"            { name: randomCategoryName },\r",
+							"            (err, response) => {\r",
+							"                if (err) {\r",
+							"                    console.error(\"Ошибка при создании категории:\", err);\r",
+							"                    return;\r",
+							"                }\r",
+							"\r",
+							"                const categoryId = response.json().id;\r",
+							"                pm.variables.set(\"categoryId\", categoryId);\r",
+							"                console.log(\"Создана категория. ID:\", categoryId);\r",
+							"\r",
+							"                // 3. Создание события\r",
+							"                const randomTitle = \"Event_\" + generateRandomString(12);\r",
+							"                const randomAnnotation = \"Annotation: \" + generateRandomString(100);\r",
+							"                const randomDescription = \"Description: \" + generateRandomString(200);\r",
+							"\r",
+							"                const randomEventDate = new Date(Date.now() + Math.floor(Math.random() * 10000000000))\r",
+							"                    .toISOString()\r",
+							"                    .replace(\"T\", \" \")\r",
+							"                    .slice(0, 19);\r",
+							"\r",
+							"                const randomLat = (Math.random() * 180 - 90).toFixed(6);\r",
+							"                const randomLon = (Math.random() * 360 - 180).toFixed(6);\r",
+							"\r",
+							"                pm.variables.set(\"randomTitle\", randomTitle);\r",
+							"                pm.variables.set(\"randomAnnotation\", randomAnnotation);\r",
+							"                pm.variables.set(\"randomDescription\", randomDescription);\r",
+							"                pm.variables.set(\"randomEventDate\", randomEventDate);\r",
+							"                pm.variables.set(\"randomLat\", randomLat);\r",
+							"                pm.variables.set(\"randomLon\", randomLon);\r",
+							"\r",
+							"                sendRequest(\r",
+							"                    `http://localhost:8080/users/${userId}/events`,\r",
+							"                    \"POST\",\r",
+							"                    {\r",
+							"                        annotation: randomAnnotation,\r",
+							"                        category: categoryId,\r",
+							"                        description: randomDescription,\r",
+							"                        eventDate: randomEventDate,\r",
+							"                        location: { lat: parseFloat(randomLat), lon: parseFloat(randomLon) },\r",
+							"                        title: randomTitle\r",
+							"                    },\r",
+							"                    (err, response) => {\r",
+							"                        if (err) {\r",
+							"                            console.error(\"Ошибка при создании события:\", err);\r",
+							"                            return;\r",
+							"                        }\r",
+							"\r",
+							"                        const eventId = response.json().id;\r",
+							"                        pm.variables.set(\"eventId\", eventId);\r",
+							"                        console.log(\"Событие создано. ID:\", eventId);\r",
+							"\r",
+							"                        // 4. Подтверждение события\r",
+							"                        sendRequest(\r",
+							"                            `http://localhost:8080/admin/events/${eventId}`,\r",
+							"                            \"PATCH\",\r",
+							"                            { stateAction: \"PUBLISH_EVENT\" },\r",
+							"                            (err, response) => {\r",
+							"                                if (err) {\r",
+							"                                    console.error(\"Ошибка при подтверждении события:\", err);\r",
+							"                                    return;\r",
+							"                                }\r",
+							"                                console.log(\"Событие подтверждено. Ответ:\", response.json());\r",
+							"                            }\r",
+							"                        );\r",
+							"                    }\r",
+							"                );\r",
+							"            }\r",
+							"        );\r",
+							"    }\r",
+							");\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const source = JSON.parse(pm.request.body.raw);\r",
+							"\r",
+							"pm.test(\"Status code is 200 or 201\", function () {\r",
+							"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Has comment create response\", function () {\r",
+							"    pm.response.to.be.withBody;\r",
+							"    pm.response.to.be.json;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Test comment 'id' field\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.property('id');\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Test comment 'comment' field\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.property('comment');\r",
+							"    pm.expect(jsonData.comment, `\"comment\" must be \"${source.comment}\"`).to.eql(source.comment);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"comment\": \"{{randomComment}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/users/{{userId}}/events/{{eventId}}/comments",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						"{{userId}}",
+						"events",
+						"{{eventId}}",
+						"comments"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Подтверждение события",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const comments = [\r",
+							"    \"Отличное событие!\",\r",
+							"    \"Обязательно приду!\",\r",
+							"    \"Очень интересно!\",\r",
+							"    \"Жду с нетерпением!\",\r",
+							"    \"Скучное мероприятие\"\r",
+							"];\r",
+							"const randomComment = comments[Math.floor(Math.random() * comments.length)];\r",
+							"pm.variables.set(\"randomComment\", randomComment);\r",
+							"\r",
+							"// Функция для выполнения POST-запроса\r",
+							"function sendRequest(url, method, body, callback) {\r",
+							"    pm.sendRequest({\r",
+							"        url: url,\r",
+							"        method: method,\r",
+							"        header: { 'Content-Type': 'application/json' },\r",
+							"        body: { mode: 'raw', raw: JSON.stringify(body) }\r",
+							"    }, callback);\r",
+							"}\r",
+							"\r",
+							"// Функция для генерации случайной строки\r",
+							"function generateRandomString(length) {\r",
+							"    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';\r",
+							"    let result = '';\r",
+							"    for (let i = 0; i < length; i++) {\r",
+							"        result += characters.charAt(Math.floor(Math.random() * characters.length));\r",
+							"    }\r",
+							"    return result;\r",
+							"}\r",
+							"\r",
+							"// 1. Создание пользователя\r",
+							"const randomName = \"User\" + generateRandomString(8);\r",
+							"const randomEmail = \"user\" + generateRandomString(8) + \"@example.com\";\r",
+							"\r",
+							"sendRequest(\r",
+							"    \"http://localhost:8080/admin/users\",\r",
+							"    \"POST\",\r",
+							"    { name: randomName, email: randomEmail },\r",
+							"    (err, response) => {\r",
+							"        if (err) {\r",
+							"            console.error(\"Ошибка при создании пользователя:\", err);\r",
+							"            return;\r",
+							"        }\r",
+							"\r",
+							"        const userId = response.json().id;\r",
+							"        pm.variables.set(\"userId\", userId);\r",
+							"        console.log(\"Создан пользователь. ID:\", userId);\r",
+							"\r",
+							"        // 2. Создание категории\r",
+							"        const randomCategoryName = \"Category_\" + generateRandomString(10);\r",
+							"\r",
+							"        sendRequest(\r",
+							"            \"http://localhost:8080/admin/categories\",\r",
+							"            \"POST\",\r",
+							"            { name: randomCategoryName },\r",
+							"            (err, response) => {\r",
+							"                if (err) {\r",
+							"                    console.error(\"Ошибка при создании категории:\", err);\r",
+							"                    return;\r",
+							"                }\r",
+							"\r",
+							"                const categoryId = response.json().id;\r",
+							"                pm.variables.set(\"categoryId\", categoryId);\r",
+							"                console.log(\"Создана категория. ID:\", categoryId);\r",
+							"\r",
+							"                // 3. Создание события\r",
+							"                const randomTitle = \"Event_\" + generateRandomString(12);\r",
+							"                const randomAnnotation = \"Annotation: \" + generateRandomString(100);\r",
+							"                const randomDescription = \"Description: \" + generateRandomString(200);\r",
+							"\r",
+							"                const randomEventDate = new Date(Date.now() + Math.floor(Math.random() * 10000000000))\r",
+							"                    .toISOString()\r",
+							"                    .replace(\"T\", \" \")\r",
+							"                    .slice(0, 19);\r",
+							"\r",
+							"                const randomLat = (Math.random() * 180 - 90).toFixed(6);\r",
+							"                const randomLon = (Math.random() * 360 - 180).toFixed(6);\r",
+							"\r",
+							"                pm.variables.set(\"randomTitle\", randomTitle);\r",
+							"                pm.variables.set(\"randomAnnotation\", randomAnnotation);\r",
+							"                pm.variables.set(\"randomDescription\", randomDescription);\r",
+							"                pm.variables.set(\"randomEventDate\", randomEventDate);\r",
+							"                pm.variables.set(\"randomLat\", randomLat);\r",
+							"                pm.variables.set(\"randomLon\", randomLon);\r",
+							"\r",
+							"                sendRequest(\r",
+							"                    `http://localhost:8080/users/${userId}/events`,\r",
+							"                    \"POST\",\r",
+							"                    {\r",
+							"                        annotation: randomAnnotation,\r",
+							"                        category: categoryId,\r",
+							"                        description: randomDescription,\r",
+							"                        eventDate: randomEventDate,\r",
+							"                        location: { lat: parseFloat(randomLat), lon: parseFloat(randomLon) },\r",
+							"                        title: randomTitle\r",
+							"                    },\r",
+							"                    (err, response) => {\r",
+							"                        if (err) {\r",
+							"                            console.error(\"Ошибка при создании события:\", err);\r",
+							"                            return;\r",
+							"                        }\r",
+							"\r",
+							"                        const eventId = response.json().id;\r",
+							"                        pm.variables.set(\"eventId\", eventId);\r",
+							"                        console.log(\"Событие создано. ID:\", eventId);\r",
+							"\r",
+							"                    }\r",
+							"                );\r",
+							"            }\r",
+							"        );\r",
+							"    }\r",
+							");\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Ответ должен содержать код статуса 200 и данные в формате json\", function () {\r",
+							"    pm.response.to.be.ok;    \r",
+							"    pm.response.to.be.withBody;\r",
+							"    pm.response.to.be.json;\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"stateAction\": \"PUBLISH_EVENT\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/admin/events/{{eventId}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"admin",
+						"events",
+						"{{eventId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Получение всех комментариев к событию",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Функция для выполнения POST-запроса\r",
+							"function sendRequest(url, method, body, callback) {\r",
+							"    pm.sendRequest({\r",
+							"        url: url,\r",
+							"        method: method,\r",
+							"        header: { 'Content-Type': 'application/json' },\r",
+							"        body: { mode: 'raw', raw: JSON.stringify(body) }\r",
+							"    }, callback);\r",
+							"}\r",
+							"\r",
+							"// Функция для генерации случайной строки\r",
+							"function generateRandomString(length) {\r",
+							"    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';\r",
+							"    let result = '';\r",
+							"    for (let i = 0; i < length; i++) {\r",
+							"        result += characters.charAt(Math.floor(Math.random() * characters.length));\r",
+							"    }\r",
+							"    return result;\r",
+							"}\r",
+							"\r",
+							"// 1. Создание пользователя\r",
+							"const randomName = \"User\" + generateRandomString(8);\r",
+							"const randomEmail = \"user\" + generateRandomString(8) + \"@example.com\";\r",
+							"\r",
+							"sendRequest(\"http://localhost:8080/admin/users\", \"POST\", { name: randomName, email: randomEmail }, (err, response) => {\r",
+							"    if (err) return console.error(\"Ошибка при создании пользователя:\", err);\r",
+							"    const userId = response.json().id;\r",
+							"    pm.variables.set(\"userId\", userId);\r",
+							"\r",
+							"    // 2. Создание категории\r",
+							"    const randomCategoryName = \"Category_\" + generateRandomString(10);\r",
+							"    sendRequest(\"http://localhost:8080/admin/categories\", \"POST\", { name: randomCategoryName }, (err, response) => {\r",
+							"        if (err) return console.error(\"Ошибка при создании категории:\", err);\r",
+							"        const categoryId = response.json().id;\r",
+							"        pm.variables.set(\"categoryId\", categoryId);\r",
+							"\r",
+							"        // 3. Создание события\r",
+							"        const randomTitle = \"Event_\" + generateRandomString(12);\r",
+							"        sendRequest(\r",
+							"            `http://localhost:8080/users/${userId}/events`,\r",
+							"            \"POST\",\r",
+							"            {\r",
+							"                annotation: \"Автоматический тест комментариев\",\r",
+							"                category: categoryId,\r",
+							"                description: \"Тестовое событие для проверки комментариев\",\r",
+							"                eventDate: new Date(Date.now() + 86400000).toISOString().slice(0, 19).replace(\"T\", \" \"),\r",
+							"                location: { lat: 55.75, lon: 37.61 },\r",
+							"                title: randomTitle\r",
+							"            },\r",
+							"            (err, response) => {\r",
+							"                if (err) return console.error(\"Ошибка при создании события:\", err);\r",
+							"                const eventId = response.json().id;\r",
+							"                pm.variables.set(\"eventId\", eventId);\r",
+							"\r",
+							"                // 4. Подтверждение события\r",
+							"                sendRequest(`http://localhost:8080/admin/events/${eventId}`, \"PATCH\", { stateAction: \"PUBLISH_EVENT\" }, (err, response) => {\r",
+							"                    if (err) return console.error(\"Ошибка при подтверждении события:\", err);\r",
+							"\r",
+							"                    // 5. Создание нескольких комментариев\r",
+							"                    const comments = [\"Отличное событие!\", \"Обязательно приду!\", \"Очень интересно!\"];\r",
+							"                    let completedRequests = 0;\r",
+							"                    comments.forEach(comment => {\r",
+							"                        sendRequest(`http://localhost:8080/users/${userId}/events/${eventId}/comments`, \"POST\", { comment }, (err, response) => {\r",
+							"                            completedRequests++;\r",
+							"                            if (completedRequests === comments.length) {\r",
+							"                                // 6. Получение всех комментариев\r",
+							"                                sendRequest(`http://localhost:8080/events/${eventId}/comments`, \"GET\", {}, (err, response) => {\r",
+							"                                    if (err) return console.error(\"Ошибка при получении комментариев:\", err);\r",
+							"                                    console.log(\"Все комментарии к событию:\", response.json());\r",
+							"                                });\r",
+							"                            }\r",
+							"                        });\r",
+							"                    });\r",
+							"                });\r",
+							"            }\r",
+							"        );\r",
+							"    });\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Ответ должен содержать код статуса 200 и данные в формате json\", function () {\r",
+							"    pm.response.to.be.ok;\r",
+							"    pm.response.to.be.withBody;\r",
+							"    pm.response.to.be.json;\r",
+							"});\r",
+							"\r",
+							"const target = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Комментарий должен содержать поля: id, comment, creatorName, event, created\", function () {\r",
+							"    pm.expect(target[0]).to.have.property('id');\r",
+							"    pm.expect(target[0]).to.have.property('comment');\r",
+							"    pm.expect(target[0]).to.have.property('creatorName');\r",
+							"    pm.expect(target[0]).to.have.property('event');\r",
+							"    pm.expect(target[0]).to.have.property('created');\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/events/{{eventId}}/comments",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"events",
+						"{{eventId}}",
+						"comments"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Удаление комментария",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Ответ должен содержать код статуса 204\", function () {\r",
+							"    pm.response.to.have.status(204);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/users/1/comments/1",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						"1",
+						"comments",
+						"1"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
