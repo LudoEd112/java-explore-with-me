@@ -1,7 +1,6 @@
 package ru.practicum.compilation.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -21,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -40,7 +38,6 @@ public class CompilationServiceImpl implements CompilationService {
             compilation.setPinned(false);
         }
         Compilation newCompilation = compilationRepository.save(compilation);
-        log.info("Подборка с id = {} создана.", compilation.getId());
         return compilationMapper.toCompilationDto(newCompilation, events.stream()
                 .map(eventMapper::toEventShortDto)
                 .toList());
@@ -49,7 +46,6 @@ public class CompilationServiceImpl implements CompilationService {
     @Override
     public void deleteCompilation(Long compId) {
         compilationRepository.deleteById(compId);
-        log.info("Удаление подборки с id = {} администратором.", compId);
     }
 
     @Override
@@ -66,7 +62,6 @@ public class CompilationServiceImpl implements CompilationService {
         if (Objects.nonNull(updateCompilationDto.getTitle())) {
             compilation.setTitle(updateCompilationDto.getTitle());
         }
-        log.info("Обновление данных подборки с id = {}.", compId);
         return compilationMapper.toCompilationDto(compilation, events.stream()
                 .map(eventMapper::toEventShortDto)
                 .toList());
@@ -83,10 +78,8 @@ public class CompilationServiceImpl implements CompilationService {
             compilationList = compilationRepository.findAll(pageRequest).toList();
         }
         if (compilationList.isEmpty()) {
-            log.info("Подборок событий еще нет.");
             return new ArrayList<>();
         }
-        log.info("Получение списка подборок событий.");
         return compilationList.stream()
                 .map(c -> compilationMapper.toCompilationDto(c, c.getEvents().stream()
                         .map(eventMapper::toEventShortDto).toList()))
@@ -98,7 +91,6 @@ public class CompilationServiceImpl implements CompilationService {
     public CompilationDtoOutput getCompilationById(Long compId) {
         Compilation compilation = compilationRepository.findById(compId)
                 .orElseThrow(() -> new NotFoundException("Подборки с id = {} не существует." + compId));
-        log.info("Получение данных подборки с id = {}.", compId);
         return compilationMapper.toCompilationDto(compilation,
                 compilation.getEvents().stream()
                         .map(eventMapper::toEventShortDto)
